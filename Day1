@@ -1,0 +1,44 @@
+import sys
+
+
+def day1_problem1(file_name):
+    with open(file_name) as file:
+        line = file.readline()
+        counter = 0
+        number_prev = line
+        while line:
+            line = file.readline()
+            number_curr = line
+            if number_curr == '':
+                break
+            if int(number_curr) > int(number_prev):
+                counter = counter + 1
+            number_prev = number_curr
+
+    return counter
+
+def day1_problem2(file_name):
+    counter = 0
+    list_of_number = []
+    with open(file_name) as file:
+        for line in file:
+            if line == '':
+                break
+            list_of_number.append(int(line))
+    prev_number = list_of_number[0] + list_of_number[1] + list_of_number[2]
+    while len(list_of_number) > 3:
+        curr_number = list_of_number.pop(0) + list_of_number[0] + list_of_number[1]
+        if curr_number > prev_number:
+            counter = counter + 1
+        prev_number = curr_number
+    curr_number = list_of_number[0] + list_of_number[1] + list_of_number[2]
+    if curr_number > prev_number:
+        counter = counter + 1
+
+    return counter
+
+if __name__ == "__main__":
+    number_of_increases = day1_problem1(sys.argv[1])
+    print(str(number_of_increases))
+    number_of_increases = day1_problem2(sys.argv[1])
+    print(str(number_of_increases))
