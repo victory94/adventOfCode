@@ -19,7 +19,29 @@ def Day2_problem1(file_name):
 
     return horizontal * depth
 
+def Day2_problem2(file_name):
+    horizontal = 0
+    depth = 0
+    aim = 0
+
+    with open(file_name) as file:
+        for line in file:
+            if line == '':
+                break
+            split_line = line.split()
+            if split_line[0] == "down":
+                aim = aim + int(split_line[1])
+            elif split_line[0] == "up":
+                aim = aim - int(split_line[1])
+            elif split_line[0] == "forward":
+                horizontal = horizontal + int(split_line[1])
+                depth = depth + (aim*int(split_line[1]))
+
+    return horizontal * depth
+
 
 if __name__ == "__main__":
     horizontal_depth = Day2_problem1(sys.argv[1])
+    print(str(horizontal_depth))
+    horizontal_depth = Day2_problem2(sys.argv[1])
     print(str(horizontal_depth))
