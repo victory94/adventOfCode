@@ -26,17 +26,43 @@ def Day4Problem(file_name):
                     bingo_cards['card' + str(counter)] = []
                     continue
                 else:
-                    bingo_cards['card' + str(counter)].append(line.split())
+                    bingo_cards['card' + str(counter)].append(numpy.array(line.split()))
+    bingo_cards['card' + str(counter)] = numpy.array(bingo_cards['card' + str(counter)])
+    bingo_score = check_winning_board(bingo_numbers, bingo_cards)
+    last_bingo_score = get_last_winning_board(bingo_numbers, bingo_cards)
+    return bingo_score, last_bingo_score
 
+
+def get_last_winning_board(bingo_numbers, bingo_cards):
+    bingo_cards_last = bingo_cards
     for number in bingo_numbers:
-        for card in bingo_cards:
-            bingo_cards[card] = numpy.where(bingo_cards[card] == number, -1, bingo_cards[card])
-        won, card_name = see_if_card_has_won(bingo_cards)
+        for card in bingo_cards_last:
+            bingo_cards_last[card] = numpy.where(bingo_cards_last[card] == number, -1, bingo_cards_last[card])
+        won, card_names = see_if_card_has_won(bingo_cards_last)
         if won:
-            return calc_wning_board(bingo_cards[card_name],number)
+            if len(bingo_cards_last) == 1:
+                return calc_wning_board(bingo_cards_last[card_names[0]], number)
+            for card_name in card_names:
+                del(bingo_cards_last[card_name])
 
 
-    return "won"
+
+
+def check_winning_board(bingo_numbers, bingo_cards):
+    bingo_cards_chaged = bingo_cards
+    for number in bingo_numbers:
+        for card in bingo_cards_chaged:
+            bingo_cards_chaged[card] = numpy.where(bingo_cards_chaged[card] == number, -1, bingo_cards_chaged[card])
+        won, card_name = see_if_card_has_won(bingo_cards_chaged)
+        if won:
+            if len(card_name) == 1:
+                return calc_wning_board(bingo_cards_chaged[card_name[0]], number)
+            else:
+                wins = []
+                for card in card_name:
+                    wins.append(calc_wning_board(bingo_cards_chaged[card],number))
+                return wins
+
 
 def calc_wning_board(board, number):
     sum_num = 0
@@ -46,33 +72,42 @@ def calc_wning_board(board, number):
                 continue
             else:
                 sum_num = sum_num + int(val)
-    return sum_num * number
+    return sum_num * int(number)
 
 
 def see_if_card_has_won(cards):
+    winning_cards = []
     for card in cards:
         if isBingo(cards[card]):
-            return True, card
-    return False, 'no_card'
+            winning_cards.append(card)
+    if len(winning_cards) == 0:
+        return False, 'no_card'
+    else:
+        return True, winning_cards
 
 def isBingo(card):
-    cols = []
-    for i in range(5):
-        row_zeros = numpy.count_nonzero(card[i:, ] == '-1')
-        col_zeros = numpy.count_nonzero(card[:, i] == '-1')
-        if row_zeros == 5 or col_zeros == 5:
+    for rows in card:
+        counter_negative = 0
+        for vals in rows:
+            if vals == '-1':
+                counter_negative = counter_negative +1
+        if counter_negative == 5:
+            return True
+
+    for col in range(5):
+        counter_negative = 0
+        for row in range(5):
+           if card[row][col] == '-1':
+                counter_negative = counter_negative +1
+        if counter_negative == 5:
             return True
 
     return False
 
-    # diagonal_zeros=np.count_nonzero(np.diag(card))
-    # diagonal1_zeros=np.count_nonzero(np.diag(np.fliplr(card)))
-    # if not diagonal_zeros or not diagonal1_zeros:
-    #     return(True)
-   #  return(True)
 
 
 
 if __name__ == "__main__":
-    bingo_score = Day4Problem(sys.argv[1])
-    print(bingo_score)
+    bingo_score, last_score = Day4Problem(sys.argv[1])
+    print("bingo score " + str(bingo_score))
+    print("last score " + str(last_score))
